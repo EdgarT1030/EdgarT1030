@@ -1,18 +1,47 @@
 # Hi, I'm Edgar 👋
 
 **Builder and solo founder.** I ship end-to-end software across very different
-domains — real-time computer vision, applied cryptography, multi-tenant SaaS, and
-data automation — and I learn fast by taking projects all the way from a blank
-folder to something that actually runs.
+domains — real-time computer vision, applied cryptography, multi-tenant SaaS,
+data automation, and now a prediction-driven community app. I learn fast by
+taking projects all the way from a blank folder to something that actually runs.
 
-I care about the parts that are easy to get wrong: tenant isolation, key handling,
-tamper-evidence, and clean readable code over clever code.
+I care about the parts that are easy to get wrong: data model correctness, tenant
+isolation, key handling, tamper-evidence, and clean readable code over clever code.
 
 ---
 
 ## 🚀 Featured projects
 
 > 🔒 = private repository (commercial work). Happy to give a live code walkthrough on request.
+
+### 🪙 [PennyPilot](https://github.com/EdgarT1030/EdgarT1030/tree/claude/pennypilot-scaffold-q1aowm/pennypilot) — Community penny-item finder + prediction engine
+A mobile-first web app that lets deal hunters find and verify "penny items" —
+products whose in-store price has dropped to $0.01 during retailer inventory purges.
+The differentiator: it doesn't just log finds like competitors do. It builds a
+proprietary markdown time-series and uses it to **predict which items are about to
+drop to $0.01 before they do**.
+
+- **Prediction engine** tracks clearance markdown stages (.06 → .03 → .01) and
+  outputs a **Penny Probability Score** (0–100) with a predicted time window (e.g.
+  "78% likely within 9–14 days"). Formula implemented as a pure, isolated, swappable
+  module (`/lib/scoring`) with **21 unit tests** — designed to be replaced with a
+  survival analysis model once real training data exists.
+- **Community ledger** — users report finds (store, SKU, price-ending, optional
+  scanner photo); others confirm/dispute; reports expire after 7 days. Trust is
+  enforced at the database layer with Postgres **Row Level Security**.
+- **Live feed** — new finds appear in real time via **Supabase Realtime** (Postgres
+  CDC → WebSocket → optimistic UI update), no manual refresh needed.
+- **SKU Checker** — a one-tap search for someone standing in the aisle: paste a SKU,
+  get back all known reports + the Penny Score + predicted window + link-outs to
+  retailer product pages.
+- **Watchlist / Predictions** — browse all high-scoring candidates sorted by probability;
+  bookmark items to follow.
+- Haversine distance sorting (no Google Maps billing), Supabase Storage for photos,
+  Zod for all input validation, magic-link auth.
+
+`TypeScript` · `Next.js 14 (App Router)` · `Supabase (Postgres + RLS + Realtime + Storage)` · `Tailwind CSS` · `Zod` · `Vitest`
+
+---
 
 ### 🛰️ [BirdWatch](https://github.com/EdgarT1030/BirdWatch) — Real-time AI surveillance
 A computer-vision security system that watches a live feed, identifies threats, and
@@ -70,9 +99,11 @@ standard library.
 |---|---|
 | **Languages** | Python, TypeScript, SQL, HTML/CSS |
 | **AI / Computer Vision** | YOLOv8 (Ultralytics), OpenCV |
-| **Web / Full-stack** | Next.js, tRPC, Tailwind, Flask, Drizzle ORM |
-| **Data & Infra** | Postgres (Row-Level Security), Neon, Vercel |
+| **Web / Full-stack** | Next.js (App Router), tRPC, Tailwind, Flask, Drizzle ORM |
+| **Data & Infra** | Postgres (Row-Level Security), Supabase, Neon, Vercel |
+| **Real-time** | Supabase Realtime (Postgres CDC → WebSocket) |
 | **Security & Crypto** | Ed25519 (PyNaCl), HMAC-SHA256, hash chains, DB-level isolation |
+| **Testing** | Vitest, pytest |
 
 ---
 
@@ -85,6 +116,7 @@ standard library.
 ## 💡 How I work
 I build in small, frequent commits, prefer simple code that the next person can
 read, and like understanding the *why* behind a tool before reaching for it —
-whether that's a digital signature scheme or a database security model.
+whether that's a digital signature scheme, a database security model, or a
+statistical prediction formula.
 
 📫 Reach me at **edgarito2001@yahoo.com**
