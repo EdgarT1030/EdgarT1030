@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { MapPin, Clock, ThumbsUp, ThumbsDown } from 'lucide-react'
 import Badge from '@/components/ui/Badge'
+import PennyScoreBadge from '@/components/PennyScoreBadge'
 import { RETAILER_LABELS } from '@/lib/constants'
 import { formatDistance, haversineDistance } from '@/lib/haversine'
 import type { ReportWithDetails } from '@/lib/supabase/types'
@@ -21,7 +22,7 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function ReportCard({ report, userLat, userLng }: ReportCardProps) {
-  const { item, store, vote_counts } = report
+  const { item, store, vote_counts, prediction } = report
   const distance =
     userLat != null && userLng != null
       ? formatDistance(haversineDistance(userLat, userLng, store.lat, store.lng))
@@ -35,11 +36,16 @@ export default function ReportCard({ report, userLat, userLng }: ReportCardProps
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-sm font-semibold text-ink">{item.name}</h3>
-          <p className="mt-0.5 text-xs text-ink-muted">
+          <p className="mt-0.5 text-xs text-ink-muted font-mono">
             {item.sku ?? item.model_number}
           </p>
         </div>
-        <Badge status={report.status} className="shrink-0" />
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <Badge status={report.status} />
+          {prediction && report.status !== 'confirmed' && (
+            <PennyScoreBadge prediction={prediction} compact />
+          )}
+        </div>
       </div>
 
       <div className="mt-3 flex items-center gap-1.5 text-xs text-ink-muted">

@@ -1,6 +1,7 @@
 export type Retailer = 'home_depot' | 'lowes' | 'menards' | 'other'
 export type ReportStatus = 'pending' | 'confirmed' | 'expired' | 'disputed'
 export type VoteType = 'confirm' | 'dispute'
+export type PriceEnding = '01' | '03' | '06' | 'other'
 
 export interface Store {
   id: string
@@ -32,10 +33,38 @@ export interface PennyReport {
   item_id: string
   store_id: string
   reported_price: number
+  price_ending: PriceEnding
   photo_url: string | null
   status: ReportStatus
   reported_by: string | null
   expires_at: string
+  created_at: string
+}
+
+export interface MarkdownObservation {
+  id: string
+  item_id: string
+  store_id: string
+  observed_price: number
+  price_ending: PriceEnding
+  reported_by: string | null
+  observed_at: string
+}
+
+export interface Prediction {
+  id: string
+  item_id: string
+  score: number
+  predicted_window_days_low: number | null
+  predicted_window_days_high: number | null
+  reasons: string[]
+  computed_at: string
+}
+
+export interface ItemWatchlist {
+  id: string
+  user_id: string
+  item_id: string
   created_at: string
 }
 
@@ -54,15 +83,20 @@ export interface Profile {
   created_at: string
 }
 
-// Joined type used in UI queries
+// Joined types used in UI queries
 export interface ReportWithDetails extends PennyReport {
   item: Item
   store: Store
   vote_counts: { confirm: number; dispute: number }
   user_vote?: VoteType | null
+  prediction?: Prediction | null
 }
 
-// Database shape expected by @supabase/supabase-js generics
+export interface ItemWithPrediction extends Item {
+  prediction: Prediction | null
+  latest_report?: Pick<PennyReport, 'status' | 'created_at'> | null
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -82,6 +116,24 @@ export interface Database {
         Row: PennyReport
         Insert: Omit<PennyReport, 'id' | 'created_at' | 'expires_at'>
         Update: Partial<Omit<PennyReport, 'id'>>
+        Relationships: []
+      }
+      markdown_observations: {
+        Row: MarkdownObservation
+        Insert: Omit<MarkdownObservation, 'id' | 'observed_at'>
+        Update: Partial<Omit<MarkdownObservation, 'id'>>
+        Relationships: []
+      }
+      predictions: {
+        Row: Prediction
+        Insert: Omit<Prediction, 'id' | 'computed_at'>
+        Update: Partial<Omit<Prediction, 'id'>>
+        Relationships: []
+      }
+      item_watchlist: {
+        Row: ItemWatchlist
+        Insert: Omit<ItemWatchlist, 'id' | 'created_at'>
+        Update: never
         Relationships: []
       }
       report_votes: {

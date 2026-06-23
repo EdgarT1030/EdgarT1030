@@ -7,12 +7,19 @@ import { submitReportSchema } from '@/lib/validators'
 import { RETAILER_OPTIONS, CATEGORY_OPTIONS } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/client'
 import PhotoUpload from '@/components/PhotoUpload'
-import type { Store } from '@/lib/supabase/types'
+import type { Store, PriceEnding } from '@/lib/supabase/types'
 
 interface SubmitFormProps {
   stores: Pick<Store, 'id' | 'retailer' | 'name' | 'city' | 'state'>[]
   userId: string
 }
+
+const PRICE_ENDINGS: { value: PriceEnding; label: string; description: string }[] = [
+  { value: '01', label: '$.01 — Penny!',      description: 'Confirmed penny price at the scanner' },
+  { value: '03', label: '$._ _3 — Final MD',  description: 'Final markdown stage — usually 1–2 weeks from penny' },
+  { value: '06', label: '$._ _6 — Mid MD',    description: 'Mid markdown stage — usually 3–6 weeks from penny' },
+  { value: 'other', label: 'Other ending',    description: 'Different ending or not sure' },
+]
 
 type FormErrors = Partial<Record<string, string>>
 
@@ -24,7 +31,10 @@ export default function SubmitForm({ stores, userId }: SubmitFormProps) {
   const [addingStore, setAddingStore] = useState(false)
   const [photoUrl, setPhotoUrl] = useState('')
 
-  // Form state
+  // Price ending — determines if this is a penny report or a candidate
+  const [priceEnding, setPriceEnding] = useState<PriceEnding>('01')
+
+  // Item fields
   const [sku, setSku] = useState('')
   const [modelNumber, setModelNumber] = useState('')
   const [itemName, setItemName] = useState('')
@@ -41,6 +51,9 @@ export default function SubmitForm({ stores, userId }: SubmitFormProps) {
   const [storeZip, setStoreZip] = useState('')
   const [storeLat, setStoreLat] = useState('')
   const [storeLng, setStoreLng] = useState('')
+
+  const isPenny = priceEnding === '01'
+  const observedPrice = priceEnding === '01' ? 0.01 : priceEnding === '03' ? 0.03 : priceEnding === '06' ? 0.06 : 0.00
 
   function detectLocation() {
     navigator.geolocation?.getCurrentPosition(({ coords }) => {
@@ -88,18 +101,18 @@ export default function SubmitForm({ stores, userId }: SubmitFormProps) {
 
     setLoading(true)
     try {
-      const supabase = createClient()
+      const supabase = createClient() as any
 
       // 1. Resolve store
       let resolvedStoreId = parsed.data.store_id!
       if (parsed.data.new_store) {
         const { data: newStore, error } = await supabase
           .from('stores')
-          .insert(parsed.data.new_store as any)
+          .insert(parsed.data.new_store)
           .select('id')
           .single()
         if (error) throw error
-        resolvedStoreId = (newStore as any).id
+        resolvedStoreId = newStore.id
       }
 
       // 2. Upsert item by SKU / model number
@@ -111,7 +124,6 @@ export default function SubmitForm({ stores, userId }: SubmitFormProps) {
         created_by: userId,
       }
 
-      // Check if item already exists
       const skuQuery = parsed.data.sku
         ? supabase.from('items').select('id').eq('sku', parsed.data.sku)
         : supabase.from('items').select('id').eq('model_number', parsed.data.model_number!)
@@ -120,29 +132,48 @@ export default function SubmitForm({ stores, userId }: SubmitFormProps) {
 
       let itemId: string
       if (existing) {
-        itemId = (existing as any).id
+        itemId = existing.id
       } else {
-        const { data: newItem, error } = await supabase.from('items').insert(itemPayload as any).select('id').single()
+        const { data: newItem, error } = await supabase.from('items').insert(itemPayload).select('id').single()
         if (error) throw error
-        itemId = (newItem as any).id
+        itemId = newItem.id
       }
 
-      // 3. Create report
-      const { data: report, error: reportError } = await supabase
-        .from('penny_reports')
-        .insert({
-          item_id: itemId,
-          store_id: resolvedStoreId,
-          reported_price: 0.01,
-          photo_url: parsed.data.photo_url || null,
-          reported_by: userId,
-        } as any)
-        .select('id')
-        .single()
+      // 3. Always write a markdown_observation row (the time-series record)
+      await supabase.from('markdown_observations').insert({
+        item_id: itemId,
+        store_id: resolvedStoreId,
+        observed_price: observedPrice,
+        price_ending: priceEnding,
+        reported_by: userId,
+      })
 
-      if (reportError) throw reportError
+      // 4. If penny (.01), also create a penny_report
+      let reportId: string | null = null
+      if (isPenny) {
+        const { data: report, error: reportError } = await supabase
+          .from('penny_reports')
+          .insert({
+            item_id: itemId,
+            store_id: resolvedStoreId,
+            reported_price: 0.01,
+            price_ending: '01',
+            photo_url: parsed.data.photo_url || null,
+            reported_by: userId,
+          })
+          .select('id')
+          .single()
 
-      router.push(`/report/${(report as any).id}`)
+        if (reportError) throw reportError
+        reportId = report.id
+      }
+
+      // Navigate appropriately
+      if (reportId) {
+        router.push(`/report/${reportId}`)
+      } else {
+        router.push(`/search?q=${encodeURIComponent(sku || modelNumber)}&submitted=1`)
+      }
     } catch {
       setServerError('Something went wrong. Please try again.')
     } finally {
@@ -152,19 +183,53 @@ export default function SubmitForm({ stores, userId }: SubmitFormProps) {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
-      {/* Item info */}
+      {/* Price ending — first, because it changes what we submit */}
+      <div className="card p-4 space-y-3">
+        <h2 className="text-sm font-semibold text-ink">What price did you see?</h2>
+        <p className="text-xs text-ink-muted">
+          Even non-penny markdowns are valuable — they feed the prediction engine.
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          {PRICE_ENDINGS.map(opt => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setPriceEnding(opt.value)}
+              className={`rounded-xl border-2 px-3 py-3 text-left transition-all
+                ${priceEnding === opt.value
+                  ? 'border-penny bg-penny/5'
+                  : 'border-stone-200 hover:border-stone-300'}`}
+            >
+              <div className="text-sm font-bold text-ink">{opt.label}</div>
+              <div className="mt-0.5 text-[11px] text-ink-muted">{opt.description}</div>
+            </button>
+          ))}
+        </div>
+        {!isPenny && (
+          <div className="rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-700">
+            <strong>Markdown candidate</strong> — this won&apos;t appear in the penny feed, but it&apos;ll
+            boost the Penny Probability Score for this item.
+          </div>
+        )}
+      </div>
+
+      {/* Item details */}
       <div className="card p-4 space-y-4">
         <h2 className="text-sm font-semibold text-ink">Item details</h2>
 
         <div>
-          <label htmlFor="sku" className="label">SKU <span className="text-ink-faint font-normal">(or model number)</span></label>
+          <label htmlFor="sku" className="label">
+            SKU <span className="text-ink-faint font-normal">(or model number)</span>
+          </label>
           <input id="sku" className="input" value={sku} onChange={e => setSku(e.target.value)}
             placeholder="e.g. 1001541689" autoCorrect="off" autoCapitalize="off" />
           {errors.sku && <p className="error-text">{errors.sku}</p>}
         </div>
 
         <div>
-          <label htmlFor="model_number" className="label">Model number <span className="text-ink-faint font-normal">(optional)</span></label>
+          <label htmlFor="model_number" className="label">
+            Model number <span className="text-ink-faint font-normal">(optional)</span>
+          </label>
           <input id="model_number" className="input" value={modelNumber} onChange={e => setModelNumber(e.target.value)}
             placeholder="e.g. GE-LED60W-A19" autoCorrect="off" autoCapitalize="off" />
         </div>
@@ -233,7 +298,9 @@ export default function SubmitForm({ stores, userId }: SubmitFormProps) {
               </div>
             </div>
             <div>
-              <label htmlFor="store_number" className="label">Store number <span className="text-ink-faint font-normal">(optional)</span></label>
+              <label htmlFor="store_number" className="label">
+                Store number <span className="text-ink-faint font-normal">(optional)</span>
+              </label>
               <input id="store_number" className="input" value={storeNumber} onChange={e => setStoreNumber(e.target.value)} placeholder="e.g. 0123" />
             </div>
             <div>
@@ -265,8 +332,7 @@ export default function SubmitForm({ stores, userId }: SubmitFormProps) {
             <div>
               <div className="mb-1.5 flex items-center justify-between">
                 <span className="label mb-0">Coordinates</span>
-                <button type="button" onClick={detectLocation}
-                  className="text-xs font-medium text-penny">
+                <button type="button" onClick={detectLocation} className="text-xs font-medium text-penny">
                   Use my location
                 </button>
               </div>
@@ -274,17 +340,21 @@ export default function SubmitForm({ stores, userId }: SubmitFormProps) {
                 <input className="input" value={storeLat} onChange={e => setStoreLat(e.target.value)} placeholder="Latitude" />
                 <input className="input" value={storeLng} onChange={e => setStoreLng(e.target.value)} placeholder="Longitude" />
               </div>
-              <p className="mt-1 text-xs text-ink-faint">Used for distance sorting &mdash; tap &ldquo;Use my location&rdquo; when you&apos;re at the store.</p>
+              <p className="mt-1 text-xs text-ink-faint">
+                Used for distance sorting &mdash; tap &ldquo;Use my location&rdquo; when you&apos;re at the store.
+              </p>
               {errors['new_store.lat'] && <p className="error-text">{errors['new_store.lat']}</p>}
             </div>
           </div>
         )}
       </div>
 
-      {/* Photo */}
-      <div className="card p-4">
-        <PhotoUpload value={photoUrl} onChange={setPhotoUrl} />
-      </div>
+      {/* Photo (only for penny reports) */}
+      {isPenny && (
+        <div className="card p-4">
+          <PhotoUpload value={photoUrl} onChange={setPhotoUrl} />
+        </div>
+      )}
 
       {serverError && (
         <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{serverError}</p>
@@ -292,11 +362,17 @@ export default function SubmitForm({ stores, userId }: SubmitFormProps) {
 
       <button type="submit" disabled={loading} className="btn-primary btn-lg w-full">
         {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
-        {loading ? 'Submitting…' : 'Submit find'}
+        {loading
+          ? 'Submitting…'
+          : isPenny
+            ? 'Submit penny find'
+            : 'Submit markdown candidate'}
       </button>
 
       <p className="text-center text-xs text-ink-faint">
-        Penny pricing is unofficial. Only submit genuine finds; false reports hurt the community.
+        {isPenny
+          ? 'Only submit genuine penny finds. False reports hurt the community.'
+          : 'Markdown candidates help predict future penny items — thanks for contributing!'}
       </p>
     </form>
   )
