@@ -97,6 +97,10 @@ export interface ItemWithPrediction extends Item {
   latest_report?: Pick<PennyReport, 'status' | 'created_at'> | null
 }
 
+export interface PredictionWithItem extends Prediction {
+  item: Item
+}
+
 export interface Database {
   public: {
     Tables: {

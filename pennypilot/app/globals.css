@@ -4,17 +4,17 @@
 
 @layer base {
   html {
-    font-family: Inter var, Inter, system-ui, sans-serif;
+    font-family: var(--font-sans, Inter, system-ui, sans-serif);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
   body {
-    @apply bg-surface text-ink;
+    @apply bg-paper text-ink;
   }
 
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-penny;
+    @apply outline-2 outline-offset-2 outline-copper;
   }
 
   * {
@@ -23,16 +23,17 @@
 }
 
 @layer components {
-  /* ── Status badges ─────────────────────────────────────── */
+  /* ── Status badges — sage / warm-amber / clay only ──── */
   .badge {
-    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide;
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5
+           text-[11px] font-semibold tracking-wide;
   }
-  .badge-confirmed { @apply bg-emerald-100 text-emerald-800; }
-  .badge-pending   { @apply bg-amber-100   text-amber-800;   }
-  .badge-expired   { @apply bg-stone-100   text-stone-500;   }
-  .badge-disputed  { @apply bg-red-50      text-red-700;     }
+  .badge-confirmed { background: #EBF3EE; color: #4C7A5B; }
+  .badge-pending   { background: #FBF3E0; color: #D99A2B; }
+  .badge-expired   { background: #F0EDEA; color: #9B918C; }
+  .badge-disputed  { background: #F9ECEA; color: #B5483B; }
 
-  /* ── Buttons ────────────────────────────────────────────── */
+  /* ── Buttons ─────────────────────────────────────────── */
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5
            text-sm font-semibold transition-all duration-150
@@ -40,52 +41,60 @@
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .btn-primary {
-    @apply btn bg-penny text-white shadow-sm
-           hover:bg-penny-dark hover:shadow-penny
+    @apply btn bg-copper text-white shadow-sm
+           hover:bg-copper-700 hover:shadow-copper
            active:scale-95;
   }
   .btn-secondary {
-    @apply btn bg-surface-muted text-ink
-           hover:bg-stone-200 active:scale-95;
+    @apply btn bg-paper-muted text-ink
+           hover:bg-copper-100 active:scale-95;
   }
-  .btn-ghost  { @apply btn text-ink hover:bg-surface-muted active:scale-95; }
+  .btn-ghost   { @apply btn text-ink hover:bg-paper-muted active:scale-95; }
   .btn-outline {
-    @apply btn border border-stone-200 bg-white text-ink
-           hover:bg-surface-muted active:scale-95;
+    @apply btn border border-copper-200 bg-paper-card text-ink
+           hover:bg-paper-muted active:scale-95;
   }
   .btn-icon { @apply btn p-2.5; }
   .btn-lg   { @apply px-6 py-3.5 text-base; }
 
-  /* ── Inputs ─────────────────────────────────────────────── */
+  /* Legacy copper-less variants for existing pages */
+  .btn-penny        { @apply btn bg-penny text-white hover:bg-penny-dark active:scale-95 shadow-sm; }
+  .btn-penny-outline { @apply btn border border-penny/30 bg-white text-penny hover:bg-penny/5 active:scale-95; }
+
+  /* ── Inputs ──────────────────────────────────────────── */
   .input {
-    @apply w-full rounded-xl border border-stone-200 bg-white px-4 py-3
+    @apply w-full rounded-xl border border-copper-200 bg-paper-card px-4 py-3
            text-sm text-ink placeholder:text-ink-faint
            transition-shadow duration-150
-           focus:border-penny focus:outline-none focus:ring-2 focus:ring-penny/20
-           disabled:bg-surface-muted disabled:cursor-not-allowed;
+           focus:border-copper focus:outline-none focus:ring-2 focus:ring-copper/20
+           disabled:bg-paper-muted disabled:cursor-not-allowed;
   }
   .label      { @apply mb-1.5 block text-sm font-medium text-ink; }
-  .error-text { @apply mt-1 text-xs text-red-600; }
+  .error-text { @apply mt-1 text-xs text-clay; }
 
-  /* ── Cards ──────────────────────────────────────────────── */
+  /* ── Cards ───────────────────────────────────────────── */
   .card {
-    @apply rounded-2xl bg-surface-card shadow-card ring-1 ring-black/[0.03];
+    @apply rounded-2xl bg-paper-card shadow-card ring-1 ring-black/[0.03];
   }
 
-  /* ── Section headings ───────────────────────────────────── */
-  .section-label {
-    @apply text-[11px] font-semibold uppercase tracking-widest text-ink-faint;
+  /* ── Section eyebrow label ───────────────────────────── */
+  .eyebrow {
+    @apply text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-faint;
+  }
+
+  /* ── Data text (SKU / distances / scores) ────────────── */
+  .data-text {
+    @apply font-mono text-[13px] tabular-nums;
   }
 }
 
-/* ── Shimmer skeleton ─────────────────────────────────────── */
+/* ── Skeleton shimmer ────────────────────────────────────── */
 .skeleton-shimmer {
-  background: linear-gradient(
-    90deg,
-    #f0ede8 0%,
-    #e8e3dc 40%,
-    #f0ede8 80%
-  );
+  background: linear-gradient(90deg, #F2EDE4 0%, #E8E1D6 40%, #F2EDE4 80%);
   background-size: 600px 100%;
   animation: shimmer 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer { animation: none; background: #F2EDE4; }
 }
