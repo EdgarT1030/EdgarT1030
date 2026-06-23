@@ -9,7 +9,6 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Copper/penny brand palette
         copper: {
           50:  '#fdf6ee',
           100: '#fae9d3',
@@ -24,17 +23,17 @@ const config: Config = {
           950: '#3c1208',
         },
         penny: {
-          DEFAULT: '#b45309', // amber-700 — main brand
+          DEFAULT: '#b45309',
           light:   '#fef3c7',
           dark:    '#78350f',
         },
         surface: {
-          DEFAULT: '#faf9f7',  // warm off-white
+          DEFAULT: '#faf9f7',
           card:    '#ffffff',
           muted:   '#f5f3ef',
         },
         ink: {
-          DEFAULT: '#1c1917', // warm near-black
+          DEFAULT: '#1c1917',
           muted:   '#78716c',
           faint:   '#a8a29e',
         },
@@ -47,8 +46,19 @@ const config: Config = {
         '2xl': '1.25rem',
       },
       boxShadow: {
-        card: '0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04)',
-        'card-hover': '0 4px 12px 0 rgb(0 0 0 / 0.10)',
+        card:       '0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04)',
+        'card-hover': '0 4px 16px 0 rgb(0 0 0 / 0.10), 0 1px 4px -1px rgb(0 0 0 / 0.06)',
+        'penny':    '0 4px 14px 0 rgb(180 83 9 / 0.25)',
+      },
+      animation: {
+        shimmer: 'shimmer 1.8s ease-in-out infinite',
+        'ping-slow': 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
+      },
+      keyframes: {
+        shimmer: {
+          '0%':   { backgroundPosition: '-600px 0' },
+          '100%': { backgroundPosition: '600px 0' },
+        },
       },
     },
   },

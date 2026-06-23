@@ -6,6 +6,7 @@
   html {
     font-family: Inter var, Inter, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   body {
@@ -15,38 +16,76 @@
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-penny;
   }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 @layer components {
-  /* Status badges */
-  .badge            { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold; }
-  .badge-confirmed  { @apply bg-emerald-100 text-emerald-800; }
-  .badge-pending    { @apply bg-amber-100   text-amber-800;   }
-  .badge-expired    { @apply bg-stone-100   text-stone-500;   }
-  .badge-disputed   { @apply bg-red-100     text-red-700;     }
-
-  /* Buttons */
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold
-           transition-all duration-150 focus-visible:outline focus-visible:outline-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  /* ── Status badges ─────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide;
   }
-  .btn-primary   { @apply btn bg-penny text-white hover:bg-penny-dark active:scale-95; }
-  .btn-secondary { @apply btn bg-surface-muted text-ink hover:bg-stone-200 active:scale-95; }
-  .btn-ghost     { @apply btn text-ink hover:bg-surface-muted active:scale-95; }
-  .btn-outline   { @apply btn border border-stone-200 bg-white text-ink hover:bg-surface-muted active:scale-95; }
-  .btn-icon      { @apply btn p-2.5; }
-  .btn-lg        { @apply px-6 py-3.5 text-base; }
+  .badge-confirmed { @apply bg-emerald-100 text-emerald-800; }
+  .badge-pending   { @apply bg-amber-100   text-amber-800;   }
+  .badge-expired   { @apply bg-stone-100   text-stone-500;   }
+  .badge-disputed  { @apply bg-red-50      text-red-700;     }
 
-  /* Inputs */
+  /* ── Buttons ────────────────────────────────────────────── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5
+           text-sm font-semibold transition-all duration-150
+           focus-visible:outline focus-visible:outline-2
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-penny text-white shadow-sm
+           hover:bg-penny-dark hover:shadow-penny
+           active:scale-95;
+  }
+  .btn-secondary {
+    @apply btn bg-surface-muted text-ink
+           hover:bg-stone-200 active:scale-95;
+  }
+  .btn-ghost  { @apply btn text-ink hover:bg-surface-muted active:scale-95; }
+  .btn-outline {
+    @apply btn border border-stone-200 bg-white text-ink
+           hover:bg-surface-muted active:scale-95;
+  }
+  .btn-icon { @apply btn p-2.5; }
+  .btn-lg   { @apply px-6 py-3.5 text-base; }
+
+  /* ── Inputs ─────────────────────────────────────────────── */
   .input {
-    @apply w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-ink
-           placeholder:text-ink-faint
+    @apply w-full rounded-xl border border-stone-200 bg-white px-4 py-3
+           text-sm text-ink placeholder:text-ink-faint
+           transition-shadow duration-150
            focus:border-penny focus:outline-none focus:ring-2 focus:ring-penny/20
            disabled:bg-surface-muted disabled:cursor-not-allowed;
   }
-  .label     { @apply mb-1.5 block text-sm font-medium text-ink; }
+  .label      { @apply mb-1.5 block text-sm font-medium text-ink; }
   .error-text { @apply mt-1 text-xs text-red-600; }
 
-  /* Card */
-  .card { @apply rounded-2xl bg-surface-card shadow-card; }
+  /* ── Cards ──────────────────────────────────────────────── */
+  .card {
+    @apply rounded-2xl bg-surface-card shadow-card ring-1 ring-black/[0.03];
+  }
+
+  /* ── Section headings ───────────────────────────────────── */
+  .section-label {
+    @apply text-[11px] font-semibold uppercase tracking-widest text-ink-faint;
+  }
+}
+
+/* ── Shimmer skeleton ─────────────────────────────────────── */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #f0ede8 0%,
+    #e8e3dc 40%,
+    #f0ede8 80%
+  );
+  background-size: 600px 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
 }
