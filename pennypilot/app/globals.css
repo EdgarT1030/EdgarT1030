@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: Inter var, Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-surface text-ink;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-penny;
+  }
+}
+
+@layer components {
+  /* Status badges */
+  .badge            { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold; }
+  .badge-confirmed  { @apply bg-emerald-100 text-emerald-800; }
+  .badge-pending    { @apply bg-amber-100   text-amber-800;   }
+  .badge-expired    { @apply bg-stone-100   text-stone-500;   }
+  .badge-disputed   { @apply bg-red-100     text-red-700;     }
+
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold
+           transition-all duration-150 focus-visible:outline focus-visible:outline-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary   { @apply btn bg-penny text-white hover:bg-penny-dark active:scale-95; }
+  .btn-secondary { @apply btn bg-surface-muted text-ink hover:bg-stone-200 active:scale-95; }
+  .btn-ghost     { @apply btn text-ink hover:bg-surface-muted active:scale-95; }
+  .btn-outline   { @apply btn border border-stone-200 bg-white text-ink hover:bg-surface-muted active:scale-95; }
+  .btn-icon      { @apply btn p-2.5; }
+  .btn-lg        { @apply px-6 py-3.5 text-base; }
+
+  /* Inputs */
+  .input {
+    @apply w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-ink
+           placeholder:text-ink-faint
+           focus:border-penny focus:outline-none focus:ring-2 focus:ring-penny/20
+           disabled:bg-surface-muted disabled:cursor-not-allowed;
+  }
+  .label     { @apply mb-1.5 block text-sm font-medium text-ink; }
+  .error-text { @apply mt-1 text-xs text-red-600; }
+
+  /* Card */
+  .card { @apply rounded-2xl bg-surface-card shadow-card; }
+}
