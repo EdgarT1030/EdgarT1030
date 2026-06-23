@@ -12,56 +12,55 @@ tamper-evidence, and clean readable code over clever code.
 
 ## 🚀 Featured projects
 
-> 🔒 = private repository. I'm happy to give a live code walkthrough on request.
+> 🔒 = private repository (commercial work). Happy to give a live code walkthrough on request.
 
-### 🛰️ BirdWatch — Real-time AI surveillance system 🔒
-A computer-vision security platform that watches a live video feed, identifies
-threats, and alerts you the moment something matters.
+### 🛰️ [BirdWatch](https://github.com/EdgarT1030/BirdWatch) — Real-time AI surveillance
+A computer-vision security system that watches a live feed, identifies threats, and
+alerts you the instant something matters.
 - **YOLOv8 + OpenCV** detection pipeline with confidence thresholding and threat
   classification (person → *intruder*, vehicles, unattended bags, animals).
-- **Live Flask dashboard** streaming annotated video (MJPEG) with on-screen
-  detection overlays, plus screen-capture ingest from a **DJI Mini 2** drone feed.
+- **Live Flask dashboard** streaming annotated video (MJPEG), plus screen-capture
+  ingest from a **DJI Mini 2** drone feed.
 - **Debounced email alerting** (SMTP) so a standing threat fires once, not 200 times.
-- **HMAC-SHA256 command authentication** with token expiry and a heartbeat
-  ("pulse") so the drone only acts on signed, fresh commands.
+- **HMAC-SHA256 command authentication** with token expiry and a heartbeat so the
+  system only acts on signed, fresh commands.
 
 `Python` · `YOLOv8 / Ultralytics` · `OpenCV` · `Flask` · `HMAC-SHA256`
 
-### 🔐 Afflant — Tamper-evident event ledger 🔒
-A forensic logging system that makes data dishonesty impossible to hide: if anyone
-edits a recorded event after the fact, an independent audit catches it instantly
-and points at the exact record.
+### 🔐 Tamper-evident event ledger 🔒
+A forensic logging system: once an event is recorded, any later edit is *provably*
+detectable.
 - **Ed25519 digital signatures** on every record (PyNaCl / libsodium) — edit one
   byte and the signature breaks.
 - **SHA-256 hash chain** linking each record to the one before it, so deleting or
   reordering history breaks the chain at the precise tampered spot.
 - **Independent verifier** that needs nothing but the log file and reports *exactly*
-  which record failed and how (bad signature vs. broken chain).
+  which record failed and how.
 - Zero homemade cryptography — trusted libraries only.
 
-`Python` · `Ed25519 / PyNaCl` · `SHA-256 hash chains` · `digital forensics`
+`Python` · `Ed25519 / PyNaCl` · `SHA-256 hash chains` · `applied cryptography`
 
-### 🏢 agency-hub — Multi-tenant SaaS platform 🔒
-A full-stack control hub designed so one customer can *never* see another's data —
+### 🏢 Multi-tenant SaaS platform 🔒
+A type-safe full-stack platform where one customer can *never* see another's data —
 enforced at the database, not just the application.
-- **Next.js (App Router) + tRPC + TypeScript** end to end, type-safe from DB to UI.
-- **Postgres Row-Level Security** with two scoped roles and a per-request tenant
-  context — isolation lives in the database, the hardest place to bypass.
-- **Composite foreign keys** `(site_id, org_id)` so a record's tenant can never drift.
+- **Next.js (App Router) + tRPC + TypeScript**, type-safe end to end from DB to UI.
+- **Postgres Row-Level Security** with scoped roles and per-request tenant context —
+  isolation lives in the database, the hardest place to bypass.
+- **Composite foreign keys** so a record's tenant can never drift.
 - An **automated isolation test** treated as the one check that must never break.
 
-`TypeScript` · `Next.js` · `tRPC` · `Postgres + RLS` · `Drizzle ORM` · `Neon` · `Vercel`
+`TypeScript` · `Next.js` · `tRPC` · `Postgres + RLS` · `Drizzle ORM`
 
-### 📈 local-lead-engine — Zero-dependency data & automation toolkit 🔒
-A Python pipeline that turns open map data into a ranked, actionable prospect list —
-running entirely on the standard library, no API keys, no paid services.
-- **Data ingestion** from OpenStreetMap (Overpass API) + Photon geocoding.
-- **Scoring engine** that ranks prospects from real signals (missing website,
-  DIY/stale builders, no HTTPS, not mobile-friendly).
-- **Automated reporting** — generates per-prospect audits and ready-to-send proposals.
-- **CRM pipeline** with status tracking, CSV export, and revenue projection.
+### 📊 Data aggregation & scoring pipeline 🔒
+A zero-dependency Python pipeline that ingests data from public APIs, ranks records
+with a configurable scoring engine, and generates reports — running entirely on the
+standard library.
+- **External REST API integration** with geospatial data sources.
+- **Configurable scoring engine** that ranks records from multiple weighted signals.
+- **Automated report generation** and CSV export.
+- **Stateful pipeline** with status tracking — and no third-party dependencies.
 
-`Python (stdlib only)` · `REST/Overpass APIs` · `data scoring` · `CLI tooling`
+`Python (stdlib only)` · `REST APIs` · `scoring algorithms` · `CLI tooling`
 
 ---
 
@@ -74,6 +73,12 @@ running entirely on the standard library, no API keys, no paid services.
 | **Web / Full-stack** | Next.js, tRPC, Tailwind, Flask, Drizzle ORM |
 | **Data & Infra** | Postgres (Row-Level Security), Neon, Vercel |
 | **Security & Crypto** | Ed25519 (PyNaCl), HMAC-SHA256, hash chains, DB-level isolation |
+
+---
+
+## 📊 GitHub
+
+![Edgar's GitHub stats](https://github-readme-stats.vercel.app/api?username=EdgarT1030&show_icons=true&hide_border=true&include_all_commits=true)
 
 ---
 
