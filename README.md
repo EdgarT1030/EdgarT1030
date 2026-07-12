@@ -27,6 +27,25 @@ enforced at the database, not just the application.
 
 ---
 
+### 🍉 [Watermelon 500](https://github.com/EdgarT1030/EdgarT1030/tree/claude/watermelon-quality-detector-f4tvdv/watermelon-500) — Snap-or-tap ripeness checker
+A zero-install, mobile-first web app that tells you if a watermelon is ripe
+using only your phone's camera and microphone — no backend, no upload.
+
+- **Photo check** — reads raw canvas pixel data and converts to HSL to spot
+  the creamy "field spot" (ripeness signal) and rind glossiness (unripe signal).
+- **Tap-sound check** — uses the **Web Audio API** (`AnalyserNode`) to listen
+  to a knuckle-tap in real time, doing onset detection against the noise floor
+  and classifying the dominant tap frequency and spectral brightness (deep
+  hollow thump = ripe, high-pitched tink = unripe).
+- **Combined verdict** — averages both scores into a plain "good to eat /
+  borderline / not ready" result with a reasoning breakdown.
+- Installable **PWA** (manifest + service worker) — everything runs client-side,
+  nothing ever leaves the device.
+
+`HTML` · `CSS` · `Vanilla JavaScript` · `Canvas API` · `Web Audio API` · `PWA`
+
+---
+
 ### 🪙 [PennyPilot](https://github.com/EdgarT1030/EdgarT1030/tree/claude/pennypilot-scaffold-q1aowm/pennypilot) — Community penny-item finder + prediction engine
 A mobile-first web app that lets deal hunters find and verify "penny items" —
 products whose in-store price has dropped to $0.01 during retailer inventory purges.
