@@ -1,9 +1,14 @@
-# Hi, I'm Edgar 👋
+# Hi, I'm Edgar.
 
-**Builder and solo founder.** I ship end-to-end software across very different
-domains — real-time computer vision, applied cryptography, multi-tenant SaaS,
-data automation, and now a prediction-driven community app. I learn fast by
-taking projects all the way from a blank folder to something that actually runs.
+I build things that sound fun.
+
+Most of my projects start with a random idea—"Could I make this work?"—and usually end with me learning a bunch of stuff I wasn't expecting along the way.
+
+Lately that's been computer vision, full-stack web apps, cryptography, automation, and prediction models. Not because I'm trying to collect technologies, but because every project ends up teaching me something different.
+
+I'm a big fan of keeping things simple, readable, and actually useful. If there's a cleaner way to build something, I'll probably rebuild it just to see if I can make it better.
+
+Everything here started as curiosity.
 
 I care about the parts that are easy to get wrong: data model correctness, tenant
 isolation, key handling, tamper-evidence, and clean readable code over clever code.
