@@ -1,17 +1,12 @@
-# Hi, I'm Edgar.
+# hey, i'm edgar.
 
-I build things that sound fun.
+i ask a lot of questions.
 
-Most of my projects start with a random idea—"Could I make this work?"—and usually end with me learning a bunch of stuff I wasn't expecting along the way.
+building software is just the medium i use to explore them.
 
-Lately that's been computer vision, full-stack web apps, cryptography, automation, and prediction models. Not because I'm trying to collect technologies, but because every project ends up teaching me something different.
+whether it's ai, drones, security, or something completely unrelated, i'm usually less interested in the technology itself than the idea behind it.
 
-I'm a big fan of keeping things simple, readable, and actually useful. If there's a cleaner way to build something, I'll probably rebuild it just to see if I can make it better.
-
-Everything here started as curiosity.
-
-I care about the parts that are easy to get wrong: data model correctness, tenant
-isolation, key handling, tamper-evidence, and clean readable code over clever code.
+this github is just a collection of things i got curious enough to build.
 
 ---
 
