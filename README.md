@@ -4,8 +4,6 @@ i ask a lot of questions.
 
 building software is just the medium i use to explore them.
 
-whether it's ai, drones, security, or something completely unrelated, i'm usually less interested in the technology itself than the idea behind it.
-
 this github is just a collection of things i got curious enough to build.
 
 ---
